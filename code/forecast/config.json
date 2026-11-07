@@ -1,0 +1,87 @@
+{
+  "protocol_version": "unified-c02-3seeds-20261014-pure-only",
+  "primary_protocol": "pure",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "split": {
+    "name": "fixed_legacy_holdout_independent_of_model_window",
+    "ratio": 0.7,
+    "offset": 5,
+    "validation_horizon_equals_test_horizon": true
+  },
+  "datasets": {
+    "daily": {
+      "lookback": 7,
+      "seasonal_period": 7,
+      "frequency": "day"
+    },
+    "hourly": {
+      "lookback": 48,
+      "seasonal_period": 24,
+      "frequency": "hour"
+    }
+  },
+  "neural": {
+    "forecast_mode": "recursive_one_step",
+    "hidden_size": 128,
+    "num_layers": 2,
+    "dropout": 0.2,
+    "epochs": 160,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "ceemdan_trials": 50,
+    "ceemdan_epsilon": 0.005,
+    "ceemdan_noise_scale": 1.0,
+    "ceemdan_parallel": false
+  },
+  "seed_derivation": {
+    "outer_offset": 20000
+  },
+  "selection_policy": "No station/model-specific seed or procedure; all stations included; primary fixed before results; no choice between protocols using test metrics",
+  "tuning": {
+    "kind": "symmetric_global_candidate_screen",
+    "candidate_count": 6,
+    "tuning_seeds": [
+      42,
+      43,
+      44
+    ],
+    "sample_seed": 20261014,
+    "sample_pairs": [
+      {
+        "dataset": "daily",
+        "site": "SC17"
+      },
+      {
+        "dataset": "daily",
+        "site": "SC54"
+      },
+      {
+        "dataset": "daily",
+        "site": "SC39"
+      },
+      {
+        "dataset": "hourly",
+        "site": "SC14"
+      },
+      {
+        "dataset": "hourly",
+        "site": "SC49"
+      },
+      {
+        "dataset": "hourly",
+        "site": "SC56"
+      }
+    ],
+    "selection_model": "SARIMA-CEEMDAN-LSTM",
+    "selection_metric": "mean validation RMSE normalized by each validation segment standard deviation",
+    "selected_candidate": "C02",
+    "selected_score": 1.1178378136460432,
+    "all_models_use_selected_candidate": true
+  },
+  "protocol_definition": "fixed recursive one-step forecasting; SARIMA forecast plus the sum of residual component forecasts"
+}

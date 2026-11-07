@@ -1,0 +1,116 @@
+MODEL:
+! ---------------------------------------------------------------------------
+! Stage 1: minimum daily staffing (MILP)
+!
+! This model is intentionally independent of Stage 2.  It returns P(i,j),
+! X(i,j,k), and Y(i,j,k).  Stage 2 reads these three arrays as its interface.
+!
+! N(i)    : theoretical upper limit of regular staff at site i on any day.
+! Nij(i,j): daily staffing-capacity parameter used in O(i)*Nij(i,j).
+!           If the notation in the paper uses N(i) for both, set Nij(i,j)=N(i).
+! O(i)    : Stage-1 attendance/utilization threshold of the site's regular
+!           workforce on a given day before temporary staff can be used
+!           (for example, 0.85). In Stage 2 the same policy parameter is
+!           applied to each employee's own attendance rate; these are
+!           different index levels and must not be conflated.
+!
+! The six shift intervals are 00-08, 05-13, 08-16, 12-20, 14-22, 16-24.
+! A(i,j,h) is the cumulative forecast through hour h.
+! ---------------------------------------------------------------------------
+
+SETS:
+  ! Change these upper bounds to the largest instance being solved.
+  SETI /1..57/: N, O, K;
+  SETJ /1..7/;
+  SETK /1..6/;
+  SETH /1..24/;
+
+  IJ(SETI,SETJ): Nij, Pij, z;
+  IJK(SETI,SETJ,SETK): x, y;
+  IJH(SETI,SETJ,SETH): A;
+ENDSETS
+
+DATA:
+  ! C is metadata; the active rows are 1..57 in this template.
+  C = 57;
+  DAY = 7;
+  SHIFT = 6;
+  HOUR = 24;
+  BIGM = 100000;
+  m = 25;                         ! regular parcels per hour
+  n = 20;                         ! temporary parcels per hour
+
+  ! Supply N(i), O(i), K(i), Nij(i,j), and A(i,j,h) from the forecast/policy
+  ! data.  The following values are placeholders only and must be replaced.
+  N = 200;
+  O = 0.85;
+  K = 2;
+  Nij = 200;
+  ! A = ... ;
+ENDDATA
+
+! Minimize total people over all site-days.  Pij is defined below, so this is
+! the same as minimizing the daily sum of regular and temporary staff.
+MIN = @SUM(IJ(i,j): Pij(i,j));
+
+! Pij is the first-stage interface passed to Stage 2.
+@FOR(IJ(i,j): Pij(i,j) = @SUM(SETK(k): x(i,j,k) + y(i,j,k)));
+
+! Daily cumulative capacity.  The first five rows implement the corrected
+! Eq. (25); at hour 13 the fourth shift has coefficient 1 (not 5).
+@FOR(IJ(i,j):
+  8 * (m*x(i,j,1) + n*y(i,j,1))
+    + 3 * (m*x(i,j,2) + n*y(i,j,2)) <= A(i,j,8));
+
+@FOR(IJ(i,j):
+  8 * (m*(x(i,j,1)+x(i,j,2)) + n*(y(i,j,1)+y(i,j,2)))
+    + 5 * (m*x(i,j,3) + n*y(i,j,3))
+    +     (m*x(i,j,4) + n*y(i,j,4)) <= A(i,j,13));
+
+@FOR(IJ(i,j):
+  8 * (m*(x(i,j,1)+x(i,j,2)+x(i,j,3))
+       + n*(y(i,j,1)+y(i,j,2)+y(i,j,3)))
+    + 4 * (m*x(i,j,4) + n*y(i,j,4))
+    + 2 * (m*x(i,j,5) + n*y(i,j,5)) <= A(i,j,16));
+
+@FOR(IJ(i,j):
+  8 * (m*(x(i,j,1)+x(i,j,2)+x(i,j,3)+x(i,j,4))
+       + n*(y(i,j,1)+y(i,j,2)+y(i,j,3)+y(i,j,4)))
+    + 6 * (m*x(i,j,5) + n*y(i,j,5))
+    + 4 * (m*x(i,j,6) + n*y(i,j,6)) <= A(i,j,20));
+
+@FOR(IJ(i,j):
+  8 * (m*(x(i,j,1)+x(i,j,2)+x(i,j,3)+x(i,j,4)+x(i,j,5))
+       + n*(y(i,j,1)+y(i,j,2)+y(i,j,3)+y(i,j,4)+y(i,j,5)))
+    + 6 * (m*x(i,j,6) + n*y(i,j,6)) <= A(i,j,22));
+
+@FOR(IJ(i,j):
+  8 * (m*@SUM(SETK(k): x(i,j,k))
+       + n*@SUM(SETK(k): y(i,j,k))) >= A(i,j,24));
+
+! Regular staff do not exceed the site-level theoretical upper limit on a day.
+@FOR(IJ(i,j): @SUM(SETK(k): x(i,j,k)) <= N(i));
+
+! Temporary staff are allowed only after the site's regular workforce reaches
+! O(i)*Nij(i,j) on that day. Thus sum_k x/Nij is the site-wide regular
+! attendance/utilization rate. This is the linear form of
+! z(i,j) <= sum_k x(i,j,k)/(O(i)*Nij(i,j)).
+@FOR(IJ(i,j):
+  @SUM(SETK(k): x(i,j,k)) >= O(i) * Nij(i,j) * z(i,j));
+@FOR(IJ(i,j):
+  @SUM(SETK(k): y(i,j,k)) <= BIGM * z(i,j));
+
+! Domains.
+@FOR(IJ(i,j): @BIN(z(i,j)));
+@FOR(IJK(i,j,k): @GIN(x(i,j,k)));
+@FOR(IJK(i,j,k): @GIN(y(i,j,k)));
+
+! After solving, export Pij, x, and y as the Stage-2 data interface.
+! A concrete Excel export can be enabled in a local LINGO installation, e.g.:
+! CALC:
+!   @OLE('stage1_output.xlsx','Pij') = Pij;
+!   @OLE('stage1_output.xlsx','x')   = x;
+!   @OLE('stage1_output.xlsx','y')   = y;
+! ENDCALC
+
+END

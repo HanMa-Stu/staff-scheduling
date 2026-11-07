@@ -1,0 +1,112 @@
+MODEL:
+! ---------------------------------------------------------------------------
+! Stage 2: joint regular-worker shift adjustment and individual assignment.
+!
+! Interface from Stage 1:
+!   Pij(i,j) : daily minimum total staffing;
+!   Q(i,j)   : daily regular-worker quota implied by O(i) and the weekly cap;
+!   XREF     : balanced Stage-1 regular shift counts;
+!   YREF     : Stage-1 temporary counts, retained for audit only.
+!
+! Stage 2 re-solves X and Y. XREF is a soft shift-distribution reference;
+! YREF is not fixed, because temporary workers are flexible in Stage 2.
+! H assigns named regular workers to the resulting X counts.
+! ---------------------------------------------------------------------------
+
+SETS:
+  SETI /1..57/: N, O, K;
+  SETJ /1..7/;
+  SETK /1..6/;
+  SETH /1..24/;
+  SETP /1..200/;
+
+  IJ(SETI,SETJ): Pij, Q;
+  IJK(SETI,SETJ,SETK): X, Y, XREF, YREF;
+  IJH(SETI,SETJ,SETH): A;
+  HIJK(SETP,SETI,SETJ,SETK): H;
+  IP(SETP,SETI): vip;
+  I(SETI): vi;
+ENDSETS
+
+DATA:
+  C = 57;
+  DAY = 7;
+  SHIFT = 6;
+  HOUR = 24;
+  PMAX = 200;
+  m = 25;
+  n = 20;
+  SHIFT_WEIGHT = 0.5;
+  TEMP_WEIGHT = 0.000001;
+
+  ! Import N, O, K, Pij, Q, XREF, YREF, and cumulative A(i,j,h).
+  N = 200;
+  O = 0.85;
+  K = 6;
+  ! Pij = ... ;
+  ! Q = ... ;
+  ! XREF = ... ;
+  ! YREF = ... ;
+  ! A = ... ;
+ENDDATA
+
+! Eq. (26) attendance balance plus soft preservation of Stage-1 shift balance.
+MIN = @SUM(IP(p,i): (vip(p,i) - vi(i))^2)
+      + SHIFT_WEIGHT * @SUM(IJK(i,j,k): (X(i,j,k)-XREF(i,j,k))^2)
+      + TEMP_WEIGHT * @SUM(IJK(i,j,k): Y(i,j,k));
+
+! Corrected Eq. (25), including coefficient 1 for shift 4 at hour 13.
+@FOR(IJ(i,j):
+  8*(m*X(i,j,1)+n*Y(i,j,1))
+  +3*(m*X(i,j,2)+n*Y(i,j,2)) <= A(i,j,8));
+@FOR(IJ(i,j):
+  8*(m*(X(i,j,1)+X(i,j,2))+n*(Y(i,j,1)+Y(i,j,2)))
+  +5*(m*X(i,j,3)+n*Y(i,j,3))
+  +(m*X(i,j,4)+n*Y(i,j,4)) <= A(i,j,13));
+@FOR(IJ(i,j):
+  8*(m*(X(i,j,1)+X(i,j,2)+X(i,j,3))
+    +n*(Y(i,j,1)+Y(i,j,2)+Y(i,j,3)))
+  +4*(m*X(i,j,4)+n*Y(i,j,4))
+  +2*(m*X(i,j,5)+n*Y(i,j,5)) <= A(i,j,16));
+@FOR(IJ(i,j):
+  8*(m*(X(i,j,1)+X(i,j,2)+X(i,j,3)+X(i,j,4))
+    +n*(Y(i,j,1)+Y(i,j,2)+Y(i,j,3)+Y(i,j,4)))
+  +6*(m*X(i,j,5)+n*Y(i,j,5))
+  +4*(m*X(i,j,6)+n*Y(i,j,6)) <= A(i,j,20));
+@FOR(IJ(i,j):
+  8*(m*(X(i,j,1)+X(i,j,2)+X(i,j,3)+X(i,j,4)+X(i,j,5))
+    +n*(Y(i,j,1)+Y(i,j,2)+Y(i,j,3)+Y(i,j,4)+Y(i,j,5)))
+  +6*(m*X(i,j,6)+n*Y(i,j,6)) <= A(i,j,22));
+@FOR(IJ(i,j):
+  8*(m*@SUM(SETK(k): X(i,j,k))
+    +n*@SUM(SETK(k): Y(i,j,k))) >= A(i,j,24));
+
+! Daily regular quota, Stage-1 total lower bound, and regular upper limit.
+@FOR(IJ(i,j): @SUM(SETK(k): X(i,j,k)) = Q(i,j));
+@FOR(IJ(i,j): @SUM(SETK(k): X(i,j,k)) <= N(i));
+@FOR(IJ(i,j): @SUM(SETK(k): X(i,j,k)+Y(i,j,k)) >= Pij(i,j));
+
+! Link regular counts to named regular-worker assignments.
+@FOR(IJK(i,j,k): @SUM(SETP(p): H(p,i,j,k)) = X(i,j,k));
+
+! Define the attendance rates used by Eq. (26).  They are not free
+! continuous variables: vip is employee p's attendance rate at site i and
+! vi is the site mean of those rates.
+@FOR(IP(p,i): vip(p,i) = @SUM(SETJ(j): @SUM(SETK(k): H(p,i,j,k))) / DAY);
+@FOR(I(i): vi(i) = @SUM(SETP(p): vip(p,i)) / N(i));
+@FOR(HIJK(p,i,j,k) | p #GT# N(i): H(p,i,j,k) = 0);
+
+! Individual attendance cap, no seven consecutive days, one shift per day.
+@FOR(SETP(p): @FOR(SETI(i):
+  @SUM(SETJ(j): @SUM(SETK(k): H(p,i,j,k))) <= O(i)*DAY));
+@FOR(SETP(p): @FOR(SETI(i): @FOR(SETJ(t) | t #LE# DAY-K(i):
+  @SUM(SETJ(j) | j #GE# t #AND# j #LE# t+K(i):
+    @SUM(SETK(k): H(p,i,j,k))) <= K(i))));
+@FOR(SETP(p): @FOR(SETI(i): @FOR(SETJ(j):
+  @SUM(SETK(k): H(p,i,j,k)) <= 1)));
+
+@FOR(IJK(i,j,k): @GIN(X(i,j,k)));
+@FOR(IJK(i,j,k): @GIN(Y(i,j,k)));
+@FOR(HIJK(p,i,j,k): @BIN(H(p,i,j,k)));
+
+END

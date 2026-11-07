@@ -1,0 +1,338 @@
+{
+  "model": "two_stage_staff_schedule",
+  "days": 7,
+  "hours": 24,
+  "m": 25.0,
+  "n": 20.0,
+  "temporary_big_m": 100000.0,
+  "stage1_method": "ga",
+  "stage1_ga": {
+    "population_size": 20,
+    "generations": 100,
+    "elite_count": 6,
+    "mutation_transfers": 5,
+    "balance_weight": 5000.0,
+    "violation_penalty": 10000000.0,
+    "patience": 100,
+    "seed": 20042
+  },
+  "ga": {
+    "population_size": 30,
+    "generations": 100,
+    "elite_count": 4,
+    "mutation_swaps": 2,
+    "violation_penalty": 1000.0,
+    "patience": 30,
+    "shift_balance_weight": 5.0,
+    "reference_shift_weight": 0.5,
+    "temporary_weight": 0.001,
+    "seed": 42
+  },
+  "sites": [
+    {
+      "site": "SC1",
+      "stage1_method": "ga",
+      "stage1_status": "feasible",
+      "stage1_message": "Stage-1 GA found a feasible staffing/balance trade-off",
+      "stage1_objective": 1644.0,
+      "stage1_ga": {
+        "method": "genetic_algorithm",
+        "seed": 20042,
+        "population_size": 20,
+        "generations": 100,
+        "generations_completed": 100,
+        "fitness": 2934.125,
+        "constraint_violation": 0.0,
+        "regular_shift_balance": 0.258025,
+        "daily_regular_totals": [
+          174,
+          170,
+          171,
+          174,
+          171,
+          172,
+          172
+        ],
+        "temporary_totals": [
+          62,
+          71,
+          67,
+          61,
+          63,
+          59,
+          57
+        ]
+      },
+      "stage2": {
+        "status": "feasible",
+        "stopped_reason": "generation_limit",
+        "generations_completed": 100,
+        "score": 0.7148664072602531,
+        "attendance_rate_limit": 0.85,
+        "max_attendance_per_employee": 5,
+        "effective_discrete_attendance_rate": 0.7142857142857143,
+        "seed": 42,
+        "variance": 1.232595164407831e-32,
+        "shift_balance": 0.003222431250765434,
+        "reference_shift_deviation": 0.0015085020128516825,
+        "temporary_reference_shift_deviation": 0.0,
+        "temporary_total": 698.0,
+        "daily_quota_error": 0.0,
+        "attendance_violation": 0.0,
+        "streak_violation": 0.0,
+        "capacity_violation": 0.0,
+        "feasible": 1.0,
+        "daily_regular_quotas": [
+          144,
+          147,
+          145,
+          143,
+          142,
+          140,
+          139
+        ],
+        "stage1_Pij_lower_bound": [
+          236,
+          241,
+          238,
+          235,
+          234,
+          231,
+          229
+        ],
+        "stage1_reference_counts": [
+          [
+            23,
+            20,
+            21,
+            24,
+            19,
+            67
+          ],
+          [
+            22,
+            21,
+            21,
+            23,
+            22,
+            61
+          ],
+          [
+            22,
+            22,
+            23,
+            23,
+            20,
+            61
+          ],
+          [
+            22,
+            21,
+            22,
+            24,
+            21,
+            64
+          ],
+          [
+            22,
+            21,
+            22,
+            24,
+            20,
+            62
+          ],
+          [
+            22,
+            23,
+            20,
+            22,
+            21,
+            64
+          ],
+          [
+            22,
+            20,
+            20,
+            23,
+            21,
+            66
+          ]
+        ],
+        "stage1_temporary_reference_counts": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            62
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            71
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            67
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            61
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            63
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            59
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            57
+          ]
+        ],
+        "stage2_regular_counts": [
+          [
+            25,
+            20,
+            19,
+            22,
+            19,
+            39
+          ],
+          [
+            21,
+            19,
+            20,
+            19,
+            22,
+            46
+          ],
+          [
+            20,
+            25,
+            21,
+            20,
+            18,
+            41
+          ],
+          [
+            20,
+            20,
+            20,
+            26,
+            19,
+            38
+          ],
+          [
+            21,
+            17,
+            20,
+            22,
+            19,
+            43
+          ],
+          [
+            20,
+            23,
+            18,
+            22,
+            19,
+            38
+          ],
+          [
+            19,
+            19,
+            21,
+            18,
+            18,
+            44
+          ]
+        ],
+        "stage2_temporary_counts": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            100
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            100
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            100
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            100
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            100
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            99
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            99
+          ]
+        ]
+      }
+    }
+  ]
+}
