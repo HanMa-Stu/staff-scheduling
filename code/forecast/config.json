@@ -13,11 +13,6 @@
     "validation_horizon_equals_test_horizon": true
   },
   "datasets": {
-    "daily": {
-      "lookback": 7,
-      "seasonal_period": 7,
-      "frequency": "day"
-    },
     "hourly": {
       "lookback": 48,
       "seasonal_period": 24,
@@ -83,5 +78,6 @@
     "selected_score": 1.1178378136460432,
     "all_models_use_selected_candidate": true
   },
-  "protocol_definition": "fixed recursive one-step forecasting; SARIMA forecast plus the sum of residual component forecasts"
+  "protocol_definition": "fixed recursive one-step forecasting; SARIMA forecast plus the sum of residual component forecasts",
+  "scope": "hourly_only; historical shared tuning metadata retained; current daily settings are in daily/config.json"
 }

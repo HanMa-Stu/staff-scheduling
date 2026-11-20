@@ -1,0 +1,1 @@
+The supplied final daily delivery contains aggregate and station-seed metrics only. No five-model per-day predictions were supplied. Old daily curves and predictions are not included. Supplementary gate forecasts are not substituted for the correction results. No models were retrained during packaging.

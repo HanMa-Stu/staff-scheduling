@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "checks": {
+    "summary_parameters": true,
+    "shift_keys": true,
+    "nonnegative_integer_counts": true,
+    "equation29_counts_equal": true,
+    "temporary_counts_retained": true,
+    "daily_regular_limit": true,
+    "temporary_bound": true,
+    "temporary_activation_gate": true,
+    "forecast_values": true,
+    "stage1_equation25": true,
+    "stage2_equation25": true,
+    "employee_keys": true,
+    "one_valid_label_per_employee_day": true,
+    "equation29_individual_assignments": true,
+    "individual_attendance_cap": true,
+    "maximum_consecutive_days": true,
+    "daily_summary": true,
+    "first_day_ids": true,
+    "summary_totals": true,
+    "forecast_hash": true
+  },
+  "regular_worker_days": 1200,
+  "temporary_worker_days": 445,
+  "attendance_days_min": 6,
+  "attendance_days_max": 6,
+  "max_consecutive_days": 6
+}

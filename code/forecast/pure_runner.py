@@ -4,7 +4,7 @@ Uses the fixed split in ``config.json``: the series is cut once, the first part 
 used for training, the last part is held out for evaluation. Every model sees only
 the training part. One row per station, seed and model is written to CSV.
 
-Run: python pure_runner.py --datasets daily --sites SC1 --models SARIMA
+Run: python pure_runner.py --datasets hourly --sites SC1 --models SARIMA
 """
 
 from __future__ import annotations
@@ -81,7 +81,7 @@ def run_station(dataset: str, site: str, config: dict, models: list[str], device
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--datasets", nargs="+", default=["daily", "hourly"], choices=["daily", "hourly"])
+    parser.add_argument("--datasets", nargs="+", default=["hourly"], choices=["hourly"])
     parser.add_argument("--sites", nargs="+", help="station ids such as SC1 SC17; default is all")
     parser.add_argument("--models", nargs="+", default=MODELS, choices=MODELS)
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cpu")

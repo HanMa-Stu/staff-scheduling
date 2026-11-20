@@ -1,0 +1,53 @@
+{
+  "scope": "supplementary_only_excluded_from_correction",
+  "theta_hi": 6.0,
+  "theta_lo": 1.0,
+  "signal": "abs(y[t-1]-y[t-2])/std(diff(y[:86]))",
+  "rules": {
+    "z>=6": "select LSTM",
+    "z<1": "select CEEMDAN-LSTM",
+    "otherwise": "retain previous state"
+  },
+  "input": "results/daily_predictions.csv",
+  "train_n": 86,
+  "test_n": 36,
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "threshold_provenance": "Source describes 6/1 as predefined; selection history was not independently verified. Supplied threshold-scan records are retained.",
+  "note": "This selects already computed branch forecasts; it does not avoid computing the CEEMDAN branch.",
+  "source_reported_statistics": {
+    "gate_6_1": {
+      "MAE": 2028.0474,
+      "RMSE": 3414.7865,
+      "R2": 0.3941
+    },
+    "LSTM": {
+      "MAE": 2023.1955,
+      "RMSE": 3422.3976,
+      "R2": 0.3757
+    },
+    "CEEMDAN-LSTM": {
+      "MAE": 2090.8791,
+      "RMSE": 3487.0687,
+      "R2": 0.3518
+    },
+    "MAE_ratio_of_means_vs_LSTM": 0.0024,
+    "MAE_mean_paired_ratio_vs_LSTM": -0.0087,
+    "MAE_winning_runs": "89/171",
+    "R2_winning_runs": "101/171",
+    "p_MAE": 0.8884,
+    "p_RMSE": 0.0764,
+    "p_R2": 0.0172,
+    "median_station_MAE_ratio": 0.9973
+  },
+  "source_reported_spell_statistics": {
+    "spell_count": 282,
+    "mean_spell_length": 3.41,
+    "median_spell_length": 3.0,
+    "max_spell_length": 16,
+    "single_day_spell_share": 0.191
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "scope": "correction_daily_five_model_results",
+  "train_n": 86,
+  "test_n": 36,
+  "sites": 57,
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "protocol": "observed_history_rolling_one_step_frozen_weights",
+  "neural": {
+    "lookback": 1,
+    "hidden": 64,
+    "layers": 2,
+    "dropout": 0.2,
+    "epochs": 400,
+    "batch": 32,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "loss": "MSE",
+    "optimizer": "Adam",
+    "gradient_clip": 5,
+    "milestones": [
+      200,
+      300
+    ],
+    "lr_gamma": 0.1
+  },
+  "scaling": "Training-only shared input min-max; separate delta-target min-max",
+  "ceemdan": {
+    "trials": 50,
+    "epsilon": 0.005,
+    "noise_scale": 1.0,
+    "parallel": false,
+    "feature_window": 32,
+    "min_window": 16,
+    "extension_points": 1,
+    "extension_slope": "(last-third_last)/2",
+    "operation_order": [
+      "decompose",
+      "align_to_K",
+      "sort_descending_zero_crossing_rate",
+      "select_penultimate_row",
+      "use_last_sorted_channel_and_previous_level"
+    ]
+  },
+  "sarima": {
+    "period": 7,
+    "orders": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        0
+      ],
+      [
+        1,
+        1,
+        1
+      ]
+    ],
+    "seasonal_orders": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        7
+      ],
+      [
+        0,
+        0,
+        1,
+        7
+      ],
+      [
+        1,
+        0,
+        1,
+        7
+      ]
+    ],
+    "selection": "minimum training AIC+BIC among converged finite candidates",
+    "test_update": "extend after each forecast; no parameter refit"
+  },
+  "training_samples": {
+    "LSTM": 85,
+    "SARIMA-LSTM": 85,
+    "CEEMDAN-LSTM": 70,
+    "SARIMA-CEEMDAN-LSTM": 70
+  },
+  "device": "TORCH_DEVICE if set; otherwise CUDA when available, else CPU. Source run environment was not supplied.",
+  "results_source": "user_supplied_final_daily_delivery",
+  "training_performed_during_packaging": false
+}
