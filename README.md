@@ -64,3 +64,15 @@ Regenerate the saved LSTM figures without training:
 python code/forecast/daily/plot_daily_lstm.py
 ```
 The figure directory contains57 station PNGs at400dpi, the full vector PDF atlas, and an SC1-SC4 four-panel figure matching the original paper style. Blue denotes observed cargo; red denotes the three-seed mean one-step prediction.
+
+
+## Hourly forecast figures
+
+Hourly figures are in `results/forecast/hourly/figures/`. Only SARIMA-LSTM is shown: it has the best mean MAE, RMSE and R2 among the five hourly models. Blue denotes the observed720-hour series; red denotes the arithmetic mean of predictions across seeds42/43/44. The fixed-origin test interval covers hours506-720 (215 hours); no observed test values are fed back. The original Fig7 style is used, with paired stacked panels in the PDF atlas. SARIMA-LSTM is the ablation without CEEMDAN; it is not the full SARIMA-CEEMDAN-LSTM model.
+
+`results/forecast/hourly/SARIMA_LSTM_predictions.csv.gz` was recovered from the original saved pure-protocol runs. All171 station-seed metric triplets were recomputed and matched the existing hourly result table within1.14e-13. No forecast model was trained and no existing hourly metric was replaced.
+
+Regenerate these figures without training:
+```bash
+python code/forecast/plot_hourly_forecasts.py
+```
