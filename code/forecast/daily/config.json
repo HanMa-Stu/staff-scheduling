@@ -96,15 +96,25 @@
       ]
     ],
     "selection": "minimum training AIC+BIC among converged finite candidates",
-    "test_update": "extend after each forecast; no parameter refit"
+    "test_update": "extend after each forecast; no parameter refit",
+    "fit_observations": 86
   },
   "training_samples": {
-    "LSTM": 85,
-    "SARIMA-LSTM": 85,
+    "LSTM": 70,
+    "SARIMA-LSTM": 70,
     "CEEMDAN-LSTM": 70,
     "SARIMA-CEEMDAN-LSTM": 70
   },
   "device": "TORCH_DEVICE if set; otherwise CUDA when available, else CPU. Source run environment was not supplied.",
   "results_source": "user_supplied_final_daily_delivery",
-  "training_performed_during_packaging": false
+  "training_performed_during_packaging": false,
+  "training_target_indices_zero_based": [
+    16,
+    85
+  ],
+  "training_target_days_one_based": [
+    17,
+    86
+  ],
+  "save_predictions_flag": "--save-pred"
 }

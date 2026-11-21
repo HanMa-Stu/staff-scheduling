@@ -1,0 +1,6 @@
+{
+  "results": "Original archived *_70target.csv files from process materials",
+  "decomposition": "Preserved original decomposition source in supplementary branch, no mirror padding, range16:86",
+  "runner": "Restore previously reviewed TR=MINW=16 in current runner; remaining function computation unchanged",
+  "retraining": false
+}
